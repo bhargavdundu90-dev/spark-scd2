@@ -1,0 +1,54 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "spark-scd2"
+dynamic = ["version"]
+description = "Slowly changing dimension Type 2 loads from full snapshots in PySpark"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.9"
+authors = [{ name = "Dundu Bhargav" }]
+keywords = ["pyspark", "spark", "scd2", "slowly-changing-dimensions", "data-engineering", "iceberg"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = ["pyspark>=3.3"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "ruff>=0.5"]
+
+[project.urls]
+Homepage = "https://github.com/bhargavdundu90-dev/spark-scd2"
+Issues = "https://github.com/bhargavdundu90-dev/spark-scd2/issues"
+Changelog = "https://github.com/bhargavdundu90-dev/spark-scd2/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+path = "src/spark_scd2/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/spark_scd2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 110
+target-version = "py39"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
