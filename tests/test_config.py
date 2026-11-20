@@ -55,3 +55,14 @@ def test_config_is_immutable():
     cfg = SCD2Config(keys=["id"], type2_cols=["a"])
     with pytest.raises(AttributeError):
         cfg.keys = ("other",)
+
+
+def test_column_roles_clash_case_insensitively():
+    with pytest.raises(ConfigError, match="one role"):
+        SCD2Config(keys=["ID"], type2_cols=["id"])
+
+
+def test_single_string_columns_become_tuples():
+    cfg = SCD2Config(keys="id", type2_cols="status", type1_cols="name")
+    assert cfg.type2_cols == ("status",)
+    assert cfg.type1_cols == ("name",)
