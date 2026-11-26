@@ -68,3 +68,23 @@ def test_iceberg_merge_matches_dataframe_api(spark, delete_mode):
         expected = apply_snapshot(expected, snapshot, day, cfg).localCheckpoint()
 
     assert as_rows(spark.table(table)) == as_rows(expected)
+
+
+def test_composite_keys_join_on_every_key():
+    cfg = SCD2Config(keys=["branch_id", "account_id"], type2_cols=["status"])
+    close, insert = iceberg_merge_sql("dim", "stg", "2026-11-03", cfg)
+    assert "ON d.`branch_id` = x.`branch_id` AND d.`account_id` = x.`account_id` AND d.`is_current`" in close
+    assert "c.`branch_id` = s.`branch_id` AND c.`account_id` = s.`account_id`" in insert
+    assert "WHERE c.`branch_id` IS NULL" in insert
+
+
+def test_surrogate_key_uses_all_keys_and_load_date():
+    cfg = SCD2Config(keys=["branch_id", "account_id"], type2_cols=["status"], surrogate_key_col="sk")
+    _, insert = iceberg_merge_sql("dim", "stg", "2026-11-03", cfg)
+    assert "CAST(s.`branch_id` AS STRING), CAST(s.`account_id` AS STRING)" in insert
+    assert "CAST(DATE '2026-11-03' AS STRING)" in insert
+
+
+def test_invalid_as_of_date_is_rejected():
+    with pytest.raises(Exception):
+        iceberg_merge_sql("dim", "stg", "not-a-date", CONFIG)
