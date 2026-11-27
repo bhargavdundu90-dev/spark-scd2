@@ -1,6 +1,7 @@
 import pytest
 
 from spark_scd2 import SCD2Config, apply_snapshot, empty_dimension, iceberg_merge_sql, validate_snapshot
+from spark_scd2.errors import ConfigError
 
 from conftest import ICEBERG_ENABLED
 from helpers import CONFIG, SCHEMA, as_rows, random_history
@@ -86,5 +87,5 @@ def test_surrogate_key_uses_all_keys_and_load_date():
 
 
 def test_invalid_as_of_date_is_rejected():
-    with pytest.raises(Exception):
+    with pytest.raises(ConfigError):
         iceberg_merge_sql("dim", "stg", "not-a-date", CONFIG)
